@@ -11,9 +11,18 @@ camera.position.x = 20;
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setClearColor(0xffffff);
 renderer.outputEncoding = THREE.sRGBEncoding;
 document.body.appendChild(renderer.domElement);
+
+const params = {
+  color: '#ffffff'
+};
+scene.background = new THREE.Color(params.color); // ← Color inicial del fondo
+
+const gui = new dat.GUI();
+gui.addColor(params, 'color').onChange(function(value) {
+  scene.background = new THREE.Color(value);
+});
 
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 
@@ -28,7 +37,9 @@ const loader = new THREE.GLTFLoader();
 loader.load(
   "./model.glb",
   function (gltf) {
-    gltf.scene.traverse((child) => {
+    const model = gltf.scene;
+
+    model.traverse((child) => {
       if (child.isMesh) {
         const oldMat = child.material;
         child.material = new THREE.MeshBasicMaterial({
@@ -37,7 +48,25 @@ loader.load(
         });
       }
     });
-    scene.add(gltf.scene);
+
+    // Centrar modelo
+    const box = new THREE.Box3().setFromObject(model);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    model.position.sub(center);
+
+    scene.add(model);
+
+    // Ajustar cámara para que encuadre todo
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fov = camera.fov * (Math.PI / 180);
+    const cameraZ = Math.abs((maxDim / 2) / Math.tan(fov / 2));
+    camera.position.set(0, maxDim * 0.2, cameraZ * 1.2); // Vista ligeramente superior
+    camera.lookAt(0, 0, 0);
+
+    // Actualizar controles
+    controls.target.set(0, 0, 0);
+    controls.update();
   },
   undefined,
   function (error) {
@@ -50,4 +79,11 @@ function animate() {
   controls.update();
   renderer.render(scene, camera);
 }
+
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
 animate();
