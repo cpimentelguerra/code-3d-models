@@ -28,7 +28,6 @@ const loader = new THREE.GLTFLoader();
 loader.load(
   "./model.glb",
   function (gltf) {
-    model.scale.set(0.5, 0.5, 0.5);
     gltf.scene.traverse((child) => {
       if (child.isMesh) {
         const oldMat = child.material;
