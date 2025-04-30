@@ -14,11 +14,13 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputEncoding = THREE.sRGBEncoding;
 document.body.appendChild(renderer.domElement);
 
+// Color del fondo inicial
 const params = {
   color: '#ffffff'
 };
-scene.background = new THREE.Color(params.color); // ← Color inicial del fondo
+scene.background = new THREE.Color(params.color); 
 
+// Seleccion del color de fondo
 const gui = new dat.GUI();
 gui.addColor(params, 'color').onChange(function(value) {
   scene.background = new THREE.Color(value);
