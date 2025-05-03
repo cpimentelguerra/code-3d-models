@@ -26,6 +26,24 @@ gui.addColor(params, 'color').onChange(function(value) {
   scene.background = new THREE.Color(value);
 });
 
+// Botón pantalla completa
+const actions = {
+  fullscreen: function () {
+    const elem = renderer.domElement;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+    } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+    } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen();
+    }
+  }
+};
+
+gui.add(actions, 'fullscreen').name('Pantalla completa');
+
 const controls = new THREE.OrbitControls(camera, renderer.domElement);
 
 const light = new THREE.DirectionalLight(0xffffff, 1);
